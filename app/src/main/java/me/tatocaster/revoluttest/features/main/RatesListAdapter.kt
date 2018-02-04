@@ -15,7 +15,7 @@ class RatesListAdapter(private var listData: ArrayList<Rate>) : RecyclerView.Ada
             listData.forEachIndexed({ index, rate ->
                 if (!rate.isSelected) {
                     listData[index] = data[index]
-                    notifyItemChanged(index)
+                    notifyItemChanged(index, data[index].rate)
                 }
             })
 
@@ -28,6 +28,18 @@ class RatesListAdapter(private var listData: ArrayList<Rate>) : RecyclerView.Ada
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_exchange_rate, parent, false)
         return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            // Perform a full update
+            onBindViewHolder(holder, position)
+        } else {
+            // Perform a partial update
+            payloads
+                    .filterIsInstance<Double>()
+                    .forEach { holder.updateExchangeRate(it) }
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -47,6 +59,10 @@ class RatesListAdapter(private var listData: ArrayList<Rate>) : RecyclerView.Ada
                 // timeout maybe
                 listData[position].isSelected = b
             })
+        }
+
+        fun updateExchangeRate(rate: Double) {
+            itemView.currencyRate.setText(rate.toString())
         }
         /*fun setClickListener(item: City, clickListener: OnItemClickListener) {
             itemView.setOnClickListener(object : View.OnClickListener() {
