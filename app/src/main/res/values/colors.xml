@@ -4,6 +4,9 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <item name="errorBackground" type="color">#E22C33</item>
-    <item name="successBackground" type="color">#689F38</item>
+    <color name="errorBackground">#E22C33</color>
+    <color name="successBackground">#689F38</color>
+    <color name="white">#FFF</color>
+    <color name="item_separator">#f5f5f6</color>
+    <color name="textColor">#767A7D</color>
 </resources>
