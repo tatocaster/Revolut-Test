@@ -8,11 +8,21 @@ import kotlinx.android.synthetic.main.item_exchange_rate.view.*
 import me.tatocaster.revoluttest.R
 import me.tatocaster.revoluttest.entity.Rate
 
-class RatesListAdapter(private var listData: List<Rate>) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
+class RatesListAdapter(private var listData: ArrayList<Rate>) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
 
-    fun updateData(data: List<Rate>) {
-        this.listData = data
-        notifyDataSetChanged()
+    fun updateData(data: ArrayList<Rate>) {
+        if (listData.isNotEmpty()) {
+            listData.forEachIndexed({ index, rate ->
+                if (!rate.isSelected) {
+                    listData[index] = data[index]
+                    notifyItemChanged(index)
+                }
+            })
+
+        } else {
+            this.listData = data
+            notifyDataSetChanged()
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -22,7 +32,7 @@ class RatesListAdapter(private var listData: List<Rate>) : RecyclerView.Adapter<
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = listData[position]
-        holder.bindView(item)
+        holder.bindView(position, item)
     }
 
     override fun getItemCount(): Int {
@@ -30,9 +40,13 @@ class RatesListAdapter(private var listData: List<Rate>) : RecyclerView.Adapter<
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bindView(item: Rate) {
+        fun bindView(position: Int, item: Rate) {
             itemView.currencyShortName.text = item.name
             itemView.currencyRate.setText(item.rate.toString())
+            itemView.currencyRate.setOnFocusChangeListener({ view: View?, b: Boolean ->
+                // timeout maybe
+                listData[position].isSelected = b
+            })
         }
         /*fun setClickListener(item: City, clickListener: OnItemClickListener) {
             itemView.setOnClickListener(object : View.OnClickListener() {

@@ -1,6 +1,7 @@
 package me.tatocaster.revoluttest.features.main
 
 import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -20,16 +21,18 @@ class MainPresenter @Inject constructor(private var view: MainContract.View,
         disposables.add(
                 Flowable.interval(1000, TimeUnit.MILLISECONDS, Schedulers.io())
                         .flatMap {
-                            println("$it")
                             apiService.getRates("EUR")
+                                    .flatMapSingle {
+                                        val ratesList = arrayListOf<Rate>()
+                                        it.rates.forEach({
+                                            ratesList.add(Rate(it.key, it.value, false))
+                                        })
+                                        Single.just(ratesList)
+                                    }
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            val ratesList = arrayListOf<Rate>()
-                            it.rates.forEach({
-                                ratesList.add(Rate(it.key, it.value))
-                            })
-                            view.dataLoaded(it.base, ratesList)
+                            view.dataLoaded(it)
                         }, {
                             view.showError(it.message!!)
                             Timber.e(it)

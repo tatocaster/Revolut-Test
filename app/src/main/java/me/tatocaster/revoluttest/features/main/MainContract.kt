@@ -6,7 +6,7 @@ class MainContract {
     interface View {
         fun showError(message: String)
 
-        fun dataLoaded(base: String, rates: ArrayList<Rate>)
+        fun dataLoaded(rates: ArrayList<Rate>)
     }
 
     interface Presenter {

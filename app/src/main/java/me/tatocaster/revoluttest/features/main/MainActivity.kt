@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         showErrorAlert(this, "", message)
     }
 
-    override fun dataLoaded(base: String, rates: ArrayList<Rate>) {
+    override fun dataLoaded(rates: ArrayList<Rate>) {
         adapter.updateData(rates)
     }
 
