@@ -30,12 +30,13 @@
 
 
     <EditText
-        android:id="@+id/currencyRate"
+        android:id="@+id/currencyRateEditText"
         android:layout_width="80dp"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
+        android:inputType="numberDecimal"
         android:padding="8dp"
         android:textColor="@color/textColor"
         android:textSize="12sp" />

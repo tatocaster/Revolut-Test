@@ -1,27 +1,43 @@
 package me.tatocaster.revoluttest.features.main
 
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.SpannableStringBuilder
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.item_exchange_rate.view.*
 import me.tatocaster.revoluttest.R
 import me.tatocaster.revoluttest.entity.Rate
+import java.util.*
 
-class RatesListAdapter(private var listData: ArrayList<Rate>) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
+class RatesListAdapter(private val listener: (String) -> Unit) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
+    private var selectedItemCurrencyCode = ""
+    private val ratesData = mutableListOf<Rate>()
 
     fun updateData(data: ArrayList<Rate>) {
-        if (listData.isNotEmpty()) {
-            listData.forEachIndexed({ index, rate ->
-                if (!rate.isSelected) {
-                    listData[index] = data[index]
-                    notifyItemChanged(index, data[index].rate)
-                }
-            })
-
-        } else {
-            this.listData = data
-            notifyDataSetChanged()
+        when {
+            ratesData.isNotEmpty() && ratesData[0].name != data[0].name -> { // clicked and chosen other item
+                ratesData.mapIndexed({ index, rate ->
+                    if (rate.name == selectedItemCurrencyCode) {
+                        Collections.swap(ratesData, index, 0)
+                        notifyItemMoved(index, 0)
+                    }
+                })
+            }
+            ratesData.isNotEmpty() -> {
+                ratesData.forEachIndexed({ index, rate ->
+                    if (rate.name != selectedItemCurrencyCode) {
+                        ratesData[index] = data[index]
+                        notifyItemChanged(index, data[index].rate)
+                    }
+                })
+            }
+            else -> {
+                ratesData.addAll(data)
+                notifyDataSetChanged()
+            }
         }
     }
 
@@ -38,42 +54,60 @@ class RatesListAdapter(private var listData: ArrayList<Rate>) : RecyclerView.Ada
             // Perform a partial update
             payloads
                     .filterIsInstance<Double>()
-                    .forEach { holder.updateExchangeRate(it) }
+                    .forEach { holder.updateExchangeRate(position, it) }
         }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = listData[position]
+        val item = ratesData[position]
         holder.bindView(position, item)
     }
 
     override fun getItemCount(): Int {
-        return listData.size
+        return ratesData.size
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bindView(position: Int, item: Rate) {
-            itemView.currencyShortName.text = item.name
-            itemView.currencyRate.setText(item.rate.toString())
-            itemView.currencyRate.setOnFocusChangeListener({ view: View?, b: Boolean ->
-                // timeout maybe
-                listData[position].isSelected = b
-            })
-        }
+        private val textChangeListener: TextWatcher
 
-        fun updateExchangeRate(rate: Double) {
-            itemView.currencyRate.setText(rate.toString())
-        }
-        /*fun setClickListener(item: City, clickListener: OnItemClickListener) {
-            itemView.setOnClickListener(object : View.OnClickListener() {
-                fun onClick(view: View) {
-                    clickListener.onItemClick(item)
+        init {
+            textChangeListener = object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {}
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (adapterPosition == 0) listener(selectedItemCurrencyCode)
                 }
-            })
-        }*/
-    }
+            }
 
-    interface OnItemClickListener {
-//        fun onItemClick(cityItem: City)
+            itemView.currencyRateEditText.addTextChangedListener(textChangeListener)
+        }
+
+        fun bindView(position: Int, item: Rate) {
+            itemView.setOnClickListener({ v ->
+                selectedItemCurrencyCode = item.name
+                listener(item.name)
+                v.currencyRateEditText.requestFocus()
+            })
+
+            itemView.currencyShortName.text = item.name
+            setEditText(position, item.rate)
+        }
+
+        fun updateExchangeRate(position: Int, rate: Double) {
+            setEditText(position, rate)
+        }
+
+        private fun setEditText(position: Int, rate: Double) {
+            if (position == 0) {
+                itemView.currencyRateEditText.removeTextChangedListener(textChangeListener)
+                itemView.currencyRateEditText.text = SpannableStringBuilder(String.format("%.2f", rate))
+                itemView.currencyRateEditText.setSelection(itemView.currencyRateEditText.text.length)
+                itemView.currencyRateEditText.addTextChangedListener(textChangeListener)
+            } else {
+                itemView.currencyRateEditText.text = SpannableStringBuilder(String.format("%.2f", rate))
+                itemView.currencyRateEditText.setSelection(itemView.currencyRateEditText.text.length)
+            }
+        }
+
     }
 }

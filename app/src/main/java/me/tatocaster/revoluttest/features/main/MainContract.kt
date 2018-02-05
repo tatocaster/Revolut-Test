@@ -12,6 +12,8 @@ class MainContract {
     interface Presenter {
         fun attach()
 
+        fun currencySelected(currencyName: String)
+
         fun detach()
     }
 }

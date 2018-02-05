@@ -13,6 +13,7 @@ import me.tatocaster.revoluttest.utils.ItemSeparatorDecoration
 import me.tatocaster.revoluttest.utils.showErrorAlert
 import javax.inject.Inject
 
+
 class MainActivity : AppCompatActivity(), MainContract.View {
     @Inject
     lateinit var mainPresenter: MainContract.Presenter
@@ -31,9 +32,12 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun setUpRecyclerView() {
-        adapter = RatesListAdapter(arrayListOf())
+        adapter = RatesListAdapter { currencyName ->
+            mainPresenter.currencySelected(currencyName)
+        }
         ratesList.adapter = adapter
         ratesList.layoutManager = LinearLayoutManager(this)
+        ratesList.setHasFixedSize(true)
         val separator = ItemSeparatorDecoration(this, ContextCompat.getColor(this, R.color.item_separator), 1f)
         ratesList.addItemDecoration(separator)
         ratesList.setEmptyView(emptyView)
