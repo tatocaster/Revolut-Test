@@ -8,18 +8,19 @@ import javax.inject.Inject
 
 
 interface RatesListRepository {
-    fun getFromService(currencyName: String): Single<ArrayList<Rate>>
+    fun getFromService(rate: Rate): Single<ArrayList<Rate>>
 }
 
 class RatesListRepositoryImpl @Inject constructor(private val apiService: ApiService) : RatesListRepository {
-    override fun getFromService(currencyName: String): Single<ArrayList<Rate>> =
-            apiService.getRates(currencyName)
+    override fun getFromService(rate: Rate): Single<ArrayList<Rate>> =
+            apiService.getRates(rate.name)
                     .flatMap {
                         val ratesList = arrayListOf<Rate>()
                         it.rates.forEach({
-                            ratesList.add(Rate(it.key, it.value))
+                            ratesList.add(Rate(it.key, it.value * rate.rate))
                         })
-                        ratesList.add(0, Rate(currencyName, 1.00)) // add as a base
+
+                        ratesList.add(0, rate) // add as a base, this will be the indicator of the first item
                         Single.just(ratesList)
                     }
                     .subscribeOn(Schedulers.io())

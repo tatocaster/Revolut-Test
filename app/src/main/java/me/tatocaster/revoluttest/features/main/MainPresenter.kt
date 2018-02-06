@@ -5,6 +5,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import me.tatocaster.revoluttest.entity.Rate
 import me.tatocaster.revoluttest.features.main.usecase.RatesListRepository
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -14,13 +15,13 @@ import javax.inject.Inject
 class MainPresenter @Inject constructor(private var view: MainContract.View,
                                         private val repository: RatesListRepository) : MainContract.Presenter {
     private val disposables: CompositeDisposable = CompositeDisposable()
-    private val currenciesUpdateQueue = BehaviorSubject.create<String>()
-    private var defaultCurrency = "EUR"
+    private val currenciesUpdateQueue = BehaviorSubject.create<Rate>()
+    private var defaultRateObject = Rate("EUR", 1.00)
 
     init {
         currenciesUpdateQueue
                 .flatMapSingle {
-                    repository.getFromService(it)
+                    repository.getFromService(defaultRateObject)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -34,12 +35,12 @@ class MainPresenter @Inject constructor(private var view: MainContract.View,
 
     override fun attach() {
         disposables.add(Flowable.interval(1000, TimeUnit.MILLISECONDS, Schedulers.io())
-                .subscribe { _ -> currenciesUpdateQueue.onNext(defaultCurrency) }
+                .subscribe { _ -> currenciesUpdateQueue.onNext(defaultRateObject) }
         )
     }
 
-    override fun currencySelected(currencyName: String) {
-        defaultCurrency = currencyName
+    override fun currencySelected(currencyName: Rate) {
+        defaultRateObject = currencyName
         currenciesUpdateQueue.onNext(currencyName)
     }
 

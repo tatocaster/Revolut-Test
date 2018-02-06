@@ -15,7 +15,7 @@ import me.tatocaster.revoluttest.entity.Rate
 import me.tatocaster.revoluttest.utils.GlideApp
 import java.util.*
 
-class RatesListAdapter(private val context: Context, private val listener: (String) -> Unit) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
+class RatesListAdapter(private val context: Context, private val listener: (Rate) -> Unit) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
     private var selectedItemCurrencyCode = ""
     private val ratesData = mutableListOf<Rate>()
 
@@ -78,7 +78,9 @@ class RatesListAdapter(private val context: Context, private val listener: (Stri
                 override fun afterTextChanged(s: Editable?) {}
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if (adapterPosition == 0) listener(selectedItemCurrencyCode)
+                    if (adapterPosition == 0)
+                        listener(Rate(selectedItemCurrencyCode,
+                                if (s?.isEmpty() != false) 0.0 else s.toString().toDouble()))
                 }
             }
 
@@ -88,7 +90,7 @@ class RatesListAdapter(private val context: Context, private val listener: (Stri
         fun bindView(position: Int, item: Rate) {
             itemView.setOnClickListener({ v ->
                 selectedItemCurrencyCode = item.name
-                listener(item.name)
+                listener(item)
                 v.currencyRateEditText.requestFocus()
             })
 
