@@ -2,18 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cell_services_groups_detailed_main_layout"
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:background="@android:color/white">
 
     <ImageView
         android:id="@+id/currencyIcon"
-        android:layout_width="70dp"
-        android:layout_height="60dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/currency_icon"
         android:scaleType="fitCenter" />
 
     <TextView

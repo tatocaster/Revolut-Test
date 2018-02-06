@@ -1,5 +1,6 @@
 package me.tatocaster.revoluttest.features.main
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -7,12 +8,14 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.item_exchange_rate.view.*
 import me.tatocaster.revoluttest.R
 import me.tatocaster.revoluttest.entity.Rate
+import me.tatocaster.revoluttest.utils.GlideApp
 import java.util.*
 
-class RatesListAdapter(private val listener: (String) -> Unit) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
+class RatesListAdapter(private val context: Context, private val listener: (String) -> Unit) : RecyclerView.Adapter<RatesListAdapter.ViewHolder>() {
     private var selectedItemCurrencyCode = ""
     private val ratesData = mutableListOf<Rate>()
 
@@ -91,6 +94,11 @@ class RatesListAdapter(private val listener: (String) -> Unit) : RecyclerView.Ad
 
             itemView.currencyShortName.text = item.name
             setEditText(position, item.rate)
+
+            GlideApp.with(context)
+                    .load("https://raw.githubusercontent.com/transferwise/currency-flags/master/src/flags/${item.name.toLowerCase()}.png")
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(itemView.currencyIcon)
         }
 
         fun updateExchangeRate(position: Int, rate: Double) {

@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun setUpRecyclerView() {
-        adapter = RatesListAdapter { currencyName ->
+        adapter = RatesListAdapter(this) { currencyName ->
             mainPresenter.currencySelected(currencyName)
         }
         ratesList.adapter = adapter
