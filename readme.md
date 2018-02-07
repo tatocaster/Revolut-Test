@@ -12,3 +12,6 @@ The app must download and update rates every 1 second using API
  update the corresponding value for other currencies.
  
 ```
+
+### Result
+![Result](https://raw.githubusercontent.com/tatocaster/Revolut-Test/master/art/revolut.gif "Result")
