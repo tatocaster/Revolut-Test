@@ -34,13 +34,14 @@ class MainPresenter @Inject constructor(private var view: MainContract.View,
 
 
     override fun attach() {
-        disposables.add(Flowable.interval(1000, TimeUnit.MILLISECONDS, Schedulers.io())
+        disposables.add(Flowable.interval(10000, TimeUnit.MILLISECONDS, Schedulers.io())
                 .subscribe { _ -> currenciesUpdateQueue.onNext(defaultRateObject) }
         )
     }
 
     override fun currencySelected(currencyName: Rate) {
-        defaultRateObject = currencyName
+        if (!currencyName.name.isBlank())
+            defaultRateObject = currencyName
         currenciesUpdateQueue.onNext(currencyName)
     }
 
