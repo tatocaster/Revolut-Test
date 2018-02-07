@@ -22,12 +22,9 @@ class RatesListAdapter(private val context: Context, private val listener: (Rate
     fun updateData(data: ArrayList<Rate>) {
         when {
             ratesData.isNotEmpty() && ratesData[0].name != data[0].name -> { // clicked and chosen other item
-                ratesData.mapIndexed({ index, rate ->
-                    if (rate.name == selectedItemCurrencyCode) {
-                        Collections.swap(ratesData, index, 0)
-                        notifyItemMoved(index, 0)
-                    }
-                })
+                val foundIndex = ratesData.indexOf(data[0])
+                Collections.swap(ratesData, foundIndex, 0)
+                notifyItemMoved(foundIndex, 0)
             }
             ratesData.isNotEmpty() -> {
                 ratesData.forEachIndexed({ index, rate ->
